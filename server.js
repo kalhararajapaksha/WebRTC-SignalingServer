@@ -115,40 +115,74 @@ io.on('connection', (socket) => {
 
   // WebRTC signaling: Offer
   socket.on('offer', ({ offer, targetUserId, roomId }) => {
+    const sender = users.get(socket.id);
+    if (!sender) {
+      console.error('❌ Offer received from unknown user:', socket.id);
+      return;
+    }
+
     const targetUser = Array.from(users.entries())
       .find(([_, user]) => user.userId === targetUserId && user.roomId === roomId);
     
     if (targetUser) {
+      console.log(`📤 Relaying offer from ${sender.userId} to ${targetUserId} in room ${roomId}`);
       io.to(targetUser[0]).emit('offer', {
         offer,
-        senderId: users.get(socket.id).userId
+        senderId: sender.userId
       });
+    } else {
+      console.warn(`⚠️ Target user ${targetUserId} not found in room ${roomId}`);
     }
   });
 
   // WebRTC signaling: Answer
   socket.on('answer', ({ answer, targetUserId, roomId }) => {
+    const sender = users.get(socket.id);
+    if (!sender) {
+      console.error('❌ Answer received from unknown user:', socket.id);
+      return;
+    }
+
     const targetUser = Array.from(users.entries())
       .find(([_, user]) => user.userId === targetUserId && user.roomId === roomId);
     
     if (targetUser) {
+      console.log(`📤 Relaying answer from ${sender.userId} to ${targetUserId} in room ${roomId}`);
       io.to(targetUser[0]).emit('answer', {
         answer,
-        senderId: users.get(socket.id).userId
+        senderId: sender.userId
       });
+    } else {
+      console.warn(`⚠️ Target user ${targetUserId} not found in room ${roomId}`);
     }
   });
 
   // WebRTC signaling: ICE Candidate
   socket.on('ice-candidate', ({ candidate, targetUserId, roomId }) => {
+    const sender = users.get(socket.id);
+    if (!sender) {
+      console.error('❌ ICE candidate received from unknown user:', socket.id);
+      return;
+    }
+
     const targetUser = Array.from(users.entries())
       .find(([_, user]) => user.userId === targetUserId && user.roomId === roomId);
     
     if (targetUser) {
+      // Log ICE candidate type for debugging (host, srflx, relay, etc.)
+      const candidateType = candidate.candidate?.split(' ')[7] || 'unknown';
+      const candidateProtocol = candidate.candidate?.includes(' UDP ') ? 'UDP' : 
+                                candidate.candidate?.includes(' TCP ') ? 'TCP' : 'unknown';
+      
+      console.log(`📡 Relaying ICE candidate (${candidateType}/${candidateProtocol}) from ${sender.userId} to ${targetUserId}`);
+      
+      // Relay immediately without delay for real-time connectivity
       io.to(targetUser[0]).emit('ice-candidate', {
         candidate,
-        senderId: users.get(socket.id).userId
+        senderId: sender.userId
       });
+    } else {
+      console.warn(`⚠️ Target user ${targetUserId} not found in room ${roomId} for ICE candidate`);
     }
   });
 
