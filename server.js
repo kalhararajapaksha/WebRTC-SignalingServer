@@ -194,6 +194,29 @@ io.on('connection', (socket) => {
     });
   });
 
+  // Handle peer connection state changes (for broadcaster to detect viewer failures)
+  socket.on('peer-connection-state', ({ userId, targetUserId, roomId, connectionState, iceConnectionState }) => {
+    const sender = users.get(socket.id);
+    if (!sender) {
+      console.error('❌ Peer connection state received from unknown user:', socket.id);
+      return;
+    }
+
+    // Find target user to relay the state change
+    const targetUser = Array.from(users.entries())
+      .find(([_, user]) => user.userId === targetUserId && user.roomId === roomId);
+    
+    if (targetUser) {
+      console.log(`📊 Relaying peer connection state: ${sender.userId} -> ${targetUserId}: ${connectionState} (ICE: ${iceConnectionState})`);
+      io.to(targetUser[0]).emit('peer-connection-state', {
+        userId: sender.userId,
+        targetUserId: targetUserId,
+        connectionState,
+        iceConnectionState,
+      });
+    }
+  });
+
   // Leave room
   socket.on('leave-room', ({ roomId }) => {
     socket.leave(roomId);
