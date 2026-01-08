@@ -1,8 +1,16 @@
 # Use Node.js 18+ LTS version
 FROM node:20-alpine
 
-# Install FFmpeg
-RUN apk add --no-cache ffmpeg
+# Install FFmpeg and build dependencies for wrtc
+RUN apk add --no-cache \
+    ffmpeg \
+    python3 \
+    make \
+    g++ \
+    gcc \
+    cmake \
+    linux-headers \
+    libc-dev
 
 # Set working directory
 WORKDIR /app
@@ -14,8 +22,8 @@ RUN addgroup -g 1001 -S nodejs && \
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production && \
+# Install ALL dependencies (including dev dependencies for building wrtc)
+RUN npm ci && \
     npm cache clean --force
 
 # Copy application files
