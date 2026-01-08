@@ -19,7 +19,7 @@ RUN npm ci --only=production && \
     npm cache clean --force
 
 # Copy application files
-COPY server.js ./
+COPY . ./
 
 # Change ownership to non-root user
 RUN chown -R nodejs:nodejs /app

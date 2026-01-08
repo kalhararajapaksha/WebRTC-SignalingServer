@@ -11,5 +11,7 @@ npm-debug.log
 docker-compose.yml
 Dockerfile
 .dockerignore
-
-
+allow-firewall.bat
+check-firewall.bat
+setup.bat
+setup.sh
