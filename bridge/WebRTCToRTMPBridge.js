@@ -21,9 +21,29 @@ let wrtcAvailable = false;
 async function loadWrtc() {
   try {
     const wrtcModule = await import('wrtc');
-    RTCPeerConnection = wrtcModule.RTCPeerConnection;
-    RTCSessionDescription = wrtcModule.RTCSessionDescription;
-    RTCIceCandidate = wrtcModule.RTCIceCandidate;
+    
+    // Handle different export patterns from wrtc
+    // Try direct exports first, then default export, then check module structure
+    if (wrtcModule.RTCPeerConnection) {
+      RTCPeerConnection = wrtcModule.RTCPeerConnection;
+      RTCSessionDescription = wrtcModule.RTCSessionDescription;
+      RTCIceCandidate = wrtcModule.RTCIceCandidate;
+    } else if (wrtcModule.default) {
+      // Handle default export
+      RTCPeerConnection = wrtcModule.default.RTCPeerConnection;
+      RTCSessionDescription = wrtcModule.default.RTCSessionDescription;
+      RTCIceCandidate = wrtcModule.default.RTCIceCandidate;
+    } else {
+      // Try to find exports in the module
+      const keys = Object.keys(wrtcModule);
+      console.log('[Bridge] Available exports from wrtc:', keys);
+      throw new Error('RTCPeerConnection not found in wrtc exports');
+    }
+    
+    if (!RTCPeerConnection || !RTCSessionDescription || !RTCIceCandidate) {
+      throw new Error('Required WebRTC classes not found in wrtc module');
+    }
+    
     wrtcAvailable = true;
     console.log('[Bridge] ✅ WebRTC (wrtc) module loaded successfully');
     return true;
