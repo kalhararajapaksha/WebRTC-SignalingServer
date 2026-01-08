@@ -17,9 +17,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "fluent-ffmpeg": "^2.1.2",
-    "@ffmpeg-installer/ffmpeg": "^1.1.0"
-  },
-  "optionalDependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "wrtc": "^0.4.7"
   },
   "devDependencies": {

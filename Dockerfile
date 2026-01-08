@@ -10,7 +10,8 @@ RUN apk add --no-cache \
     gcc \
     cmake \
     linux-headers \
-    libc-dev
+    libc-dev \
+    git
 
 # Set working directory
 WORKDIR /app
@@ -23,8 +24,12 @@ RUN addgroup -g 1001 -S nodejs && \
 COPY package*.json ./
 
 # Install ALL dependencies (including dev dependencies for building wrtc)
-RUN npm ci && \
+# Use npm install instead of npm ci to ensure optional dependencies are installed
+RUN npm install --production=false && \
     npm cache clean --force
+
+# Verify wrtc installation (using dynamic import for ES modules)
+RUN node --input-type=module -e "import('wrtc').then(m => { console.log('✅ wrtc installed successfully'); if (!m.RTCPeerConnection) throw new Error('RTCPeerConnection not found'); }).catch(e => { console.error('❌ wrtc installation failed:', e.message); process.exit(1); })"
 
 # Copy application files
 COPY . ./
