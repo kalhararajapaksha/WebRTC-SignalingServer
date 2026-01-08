@@ -23,9 +23,9 @@ RUN addgroup -g 1001 -S nodejs && \
 # Copy package files
 COPY package*.json ./
 
-# Install ALL dependencies (including dev dependencies for building wrtc)
-# Use npm install instead of npm ci to ensure optional dependencies are installed
-RUN npm install --production=false && \
+# Install ALL dependencies (including optional dependencies like wrtc)
+# Use npm install with --no-optional=false to ensure optional dependencies are installed
+RUN npm install --production=false --no-optional=false && \
     npm cache clean --force
 
 # Verify wrtc installation (using dynamic import for ES modules)

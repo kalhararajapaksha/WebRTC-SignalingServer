@@ -4,7 +4,19 @@ This server provides WebRTC signaling and a bridge service that converts WebRTC 
 
 ## Installation
 
-### Basic Installation
+### Windows Development
+
+On Windows, `wrtc` cannot be installed due to build tool requirements. Use the special install script:
+
+```bash
+npm run install:windows
+```
+
+This will install all dependencies except `wrtc`, which is expected. The server will start but the bridge will log warnings.
+
+### Linux/Docker (Production)
+
+On Linux or in Docker, `wrtc` installs correctly:
 
 ```bash
 npm install

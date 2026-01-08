@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "install:windows": "npm install --ignore-scripts",
+    "postinstall": "node --input-type=module -e \"import('wrtc').then(() => console.log('✅ wrtc installed')).catch(() => console.warn('⚠️  wrtc not installed (expected on Windows). Use Docker for production.'))\""
   },
   "keywords": ["webrtc", "signaling", "live-streaming"],
   "author": "",
@@ -17,7 +19,9 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "fluent-ffmpeg": "^2.1.2",
-    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@ffmpeg-installer/ffmpeg": "^1.1.0"
+  },
+  "optionalDependencies": {
     "wrtc": "^0.4.7"
   },
   "devDependencies": {
