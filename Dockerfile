@@ -23,6 +23,9 @@ RUN addgroup -g 1001 -S nodejs && \
 # Copy package files
 COPY package*.json ./
 
+# Install node-pre-gyp globally first (required by wrtc during installation)
+RUN npm install -g node-pre-gyp@latest
+
 # Install ALL dependencies (wrtc is now in dependencies, so it will install)
 RUN npm install --production=false && \
     npm cache clean --force
