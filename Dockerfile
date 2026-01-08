@@ -1,5 +1,8 @@
-# Use Node.js LTS version for stability
+# Use Node.js 18+ LTS version
 FROM node:20-alpine
+
+# Install FFmpeg
+RUN apk add --no-cache ffmpeg
 
 # Set working directory
 WORKDIR /app
@@ -24,7 +27,7 @@ RUN chown -R nodejs:nodejs /app
 # Switch to non-root user
 USER nodejs
 
-# Expose the port
+# Expose the port for HTTP/WebSocket
 EXPOSE 3001
 
 # Health check
@@ -33,5 +36,3 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 
 # Start the server
 CMD ["node", "server.js"]
-
-
