@@ -1,24 +1,25 @@
-# Use Node.js 18+ LTS version
-FROM node:20-alpine
+# Use Node.js 20 LTS version (Debian-based for glibc compatibility with wrtc)
+FROM node:20-slim
 
 # Install FFmpeg and build dependencies for wrtc
-RUN apk add --no-cache \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
     ffmpeg \
     python3 \
     make \
     g++ \
     gcc \
     cmake \
-    linux-headers \
-    libc-dev \
-    git
+    git \
+    ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
 # Create non-root user for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
+RUN groupadd -r nodejs && \
+    useradd -r -g nodejs -u 1001 nodejs
 
 # Copy package files
 COPY package*.json ./
